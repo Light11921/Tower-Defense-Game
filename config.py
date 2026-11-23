@@ -4,59 +4,80 @@ import random
 
 screen_width = 960
 screen_height = 540
+width_act = 0
+height_act = 0
 FPS = 60
 tiles = 30 # -- It is the sall block which divided the eniter screen in block of dimension 30x30 for now it is for grasses 
 
-#i make another wavepoint for diff enemries as it feels better
-#from this the enmery just go thriugh the exact point and to reach the other point they walk in the straight line
+#here view_w,view_h are the dimesions of the game visble on the window currently
+#-- world_w,world_h are the dimesins of the whole game where everthing is build 
+
+class Camera :
+    def __init__(self,view_w,view_h,world_w,world_h,zoom_min = 0.5,zoom_max = 2.0):
+        self.view_w,self.view_h = view_w,view_h
+        self.world_w,self.world_h = world_w,world_h
+     
+        self.min_zoom = max(zoom_min,view_w/world_w,view_h/world_h)#it will chose the max btw the ratio and the defalut zoom_min
+
+        self.zoom_max = zoom_max
+        self.zoom = max(1.0,self.min_zoom)
+        
+        self.x = (world_w - view_w/self.zoom)/2
+        self.y = (world_h - view_h/self.zoom)/2
+     
+        self.dragging = False
+        self.pan_speed = 700
 
 
-SPAWN_REGIONS = [
-    [(0, 200),   (0, 150)],     # top-left corner
-    [(760, 959), (0, 150)],     # top-right corner
-    [(0, 200),   (390, 539)],   # bottom-left corner
-    [(760, 959), (390, 539)],   # bottom-right corner
-    [(380, 580), (0, 40)],      # top-middle strip
-]
+    def world_screen(self,wx,wy):
+        return (wx - self.x) * self.zoom,(wy - self.y) * self.zoom
 
-def region_decideer():
-    ren_rag = random.choice(SPAWN_REGIONS)
-    (x_min,x_max),(y_min,y_max) = ren_rag
-    return random.randint(x_min,x_max), random.randint(y_min,y_max)
+    def screen_world(self,sx,sy):
+        return sx/self.zoom + self.x,sy/self.zoom +self.y
+  
+    def clamp(self):
+        max_x = self.world_w - self.view_w/self.zoom
+        max_y = self.world_h - self.view_h/self.zoom
 
+        self.x = min(max(self.x,0))
+        self.y = min(max(self.y,0))
 
-wavepoint = [
-    (50,50), #spawn point
-    (200,50), #point 1
-    (200,screen_height//2), #point 2
-    (screen_width//2,screen_height//2), #point 3
-]
+    def zoom_at(self,screen_pos,factor):
 
-#name of the particaluar tower cost range damage dealt firerate damatype 
-TOWERS = {
-    "cannon": {"cost": 50, "range": 150, "damage": 10, "fire_rate": 1.0, "damage_type": "physical"},
-    "fire":   {"cost": 75, "range": 120, "damage": 8,  "fire_rate": 1.5, "damage_type": "fire"},
-    "ice":    {"cost": 75, "range": 130, "damage": 5,  "fire_rate": 1.2, "damage_type": "ice"},
-    "arcane": {"cost": 150, "range": 160, "damage": 12, "fire_rate": 0.8, "damage_type": "true"},
-}
+        sx,sy = screen_pos
+        wx,wy = self.world_screen(sx,sy)
+        self.zoom = min(max(self.zoom*factor,self.min_zoom),self.zoom_max)
 
-#type of enemy there mx health speed and reward--after slying then how much coin you will get to purchase something 
-ENEMIES = {
-    "grunt": {"health": 50,  "speed": 80,  "reward": 10},
-    "fast":  {"health": 30,  "speed": 140, "reward": 12},
-    "tank":  {"health": 200, "speed": 45,  "reward": 25},
-    "boss":  {"health": 800, "speed": 40,  "reward": 100},
-}
+        self.x = wx -sy/self.zoom
+        self.y = wy - sx/self.zoom
+        self.clamp()
 
+    def pan(self,dx_screen,dy_screen):
 
+        self.x -= dx_screen/self.zoom
+        self.y -= dy_screen/self.zoom
+        self.clam()
 
+    def handle_event(self, e):
+        if e.type == pygame.MOUSEWHEEL:
+            self.zoom_at(pygame.mouse.get_pos(), 1.1 ** e.y)
+        elif e.type == pygame.MOUSEBUTTONDOWN and e.button in (2,3):
+            self.dragging = True
+        elif e.type == pygame.MOUSEBUTTONUP and e.button in (2,3):
+            self.dragging = False
+        elif e.type == pygame.MOUSEMOTION and self.dragging:
+            self.pan(*e.rel) 
 
+    def update(self,dt):
+        keys = pygame.key.get_pressed()
+        step = self.pan_speed*dt
+        
+        dx = (keys[pygame.K_LEFT] or keys[pygame.K_a]) - (keys[pygame.K_RIGHT] or keys[pygame.K_d])
+        dy = (keys[pygame.K_UP or keys[pygame.K_w]]) - (keys[pygame.K_DOWN] or keys[pygame.K_w])
 
-
-
-
-
-
+        if dx or dy :
+            self.pan(dx*step,dy*step)         
+        
 
 
 
