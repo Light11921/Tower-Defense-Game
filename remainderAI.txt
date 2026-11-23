@@ -1,0 +1,1 @@
+you’re using pygame-ce in a venv on Python 3.15, building a tower defense game with adaptive enemies, targeting PC and mobile via pygbag, with files main.py, characters.py, waves.py, stats.py, ui.py, and config.py. That keeps the new chat focused and the code easier to follow.
