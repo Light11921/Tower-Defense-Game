@@ -1,44 +1,43 @@
 import pygame
-import config
-
+import assets
+import math
+import random
 #config,height,width are the diesion of the screen of the game window
 #backimage is the grass image in in the samller scale usign transform and scale function we have changed
 #back is the scale of the screen we have to use the image to decoreate 
 #blit changes the backgournd in the backgroudn the two for loops help in it the paramter of the blit function
 #is the per unit background at what coordinate we have to repalce it 
 
-def background_maker(bac_image,width,height,tiles):
-    unit_back = pygame.transform.scale(bac_image,(tiles,tiles))#scallling the image
+def draw_background(cam,screen,world_surface):
+    world_rect = world_surface.get_rect()
+
+    view = pygame.Rect(int(cam.x),int(cam.y),math.ceil(cam.view_w/cam.zoom) + 2, math.ceil(cam.view_h/cam.zoom) + 2).clip(world_rect)
     
-    back = pygame.Surface((width,height))#defining where we have to scale aply the bckgournd
-    
-    for x in range(0,width,tiles):
-        for y in range(0,height,tiles):
-            back.blit(unit_back,(x,y))
-    return back #it return the whole background at once i have to only return the funvtion in the main file       
+    piece = world_surface.subsurface(view)
+    size = (math.ceil(view.w * cam.zoom),math.ceil(view.h*cam.zoom)) 
+    scaled = pygame.transform.scale(piece,size)
+    screen.blit(scaled,((view.x - cam.x) * cam.zoom,(view.y - cam.y) * cam.zoom))   
 
-#i want to create a path dialgonal and vertaicl ones where the enemy can follow and gather and after a certain area they can move freely and target the nearest tower
+def draw_sprite(cam,screen,image,world_pos):
 
-#today i have complate the background and wayoints where the enmey would allign and move towards the tower 
+    w = max(1,round(image.get_width()*cam.zoom))
+    h = max(1,round(image.get_height()*cam.zoom))
 
-def path_maker_horizontl(path_image,width,height,tiles):
-    unit_back = pygame.transform.scale(path_image,(tiles,tiles))
+    scaled = pygame.transform.scale(image,(w,h))
+    sx,sy = cam.world_screen(*world_pos)
+    screen.blit(scaled,(sx -w/2,sy - h/2))
 
-    path = pygame.Surface((width,height),pygame.SRCALPHA)
+def build_world(images,world_w,world_h,titles,waypoints = 1):
+    grass = pygame.transform.scale(images["grass1"],(titles,titles))
+    world = pygame.Surface((world_w,world_h))
+    for x in (0,world_w,titles):
+        for y in (0,world_h,titles):
+            world.blit(grass,(x,y))
 
-    for x in range(200,width,30):
-        for y in range(0,height,30):
-            path.blit(unit_back,(x,y))
-    return path
+    grass2 = pygame.transform.scale(images["grass2"],(titles,titles))
+    for _ in range((world_w//titles)*(world_h//titles)//2):
+        world.blit(grass2,(random.randrange(0,world_w,titles),random.randrange(0,world_h,titles)))
 
-
-
-
-
-
-
-
-
-
-
-
+    base = pygame.transform.scale(images["arcane"],(titles,titles))
+    world.blit(base,base.get_rect(center = (world_w//2,world_h//2)))
+    return world
