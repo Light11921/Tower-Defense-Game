@@ -38,6 +38,6 @@ def build_world(images,world_w,world_h,titles,waypoints = 1):
     for _ in range((world_w//titles)*(world_h//titles)//2):
         world.blit(grass2,(random.randrange(0,world_w,titles),random.randrange(0,world_h,titles)))
 
-    base = pygame.transform.scale(images["arcane"],(titles,titles))
+    base = pygame.transform.scale(images["base"],(titles+30,titles+30))
     world.blit(base,base.get_rect(center = (world_w//2,world_h//2)))
     return world

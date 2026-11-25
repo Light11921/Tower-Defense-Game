@@ -4,8 +4,8 @@ import random
 
 screen_width = 960
 screen_height = 540
-width_act = 960*2
-height_act = 540*2
+width_act = 960*4
+height_act = 540*4
 FPS = 60
 tiles = 30 # -- It is the sall block which divided the eniter screen in block of dimension 30x30 for now it is for grasses 
 
