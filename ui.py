@@ -30,8 +30,8 @@ def draw_sprite(cam,screen,image,world_pos):
 def build_world(images,world_w,world_h,titles,waypoints = 1):
     grass = pygame.transform.scale(images["grass1"],(titles,titles))
     world = pygame.Surface((world_w,world_h))
-    for x in (0,world_w,titles):
-        for y in (0,world_h,titles):
+    for x in range(0,world_w,titles):
+        for y in range(0,world_h,titles):
             world.blit(grass,(x,y))
 
     grass2 = pygame.transform.scale(images["grass2"],(titles,titles))
