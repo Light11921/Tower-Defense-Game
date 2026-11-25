@@ -38,6 +38,30 @@ def build_world(images,world_w,world_h,titles,waypoints = 1):
     for _ in range((world_w//titles)*(world_h//titles)//2):
         world.blit(grass2,(random.randrange(0,world_w,titles),random.randrange(0,world_h,titles)))
 
-    base = pygame.transform.scale(images["base"],(titles+30,titles+30))
-    world.blit(base,base.get_rect(center = (world_w//2,world_h//2)))
+    base = pygame.transform.scale(images["base"],(titles*2,titles*2))
+    world.blit(base,base.get_rect(center = (world_w//2,world_h//2))) 
+   
     return world
+
+def make_overlay(images,land,world_w,world_h,titles):
+    overlay = pygame.Surface((world_w,world_h),pygame.SRCALPHA)
+    overlay.fill((0,0,0,120))
+    x,y,w,h = land.pixel_rect(titles)
+    rect = pygame.Rect(land.pixel_rect(titles))
+    overlay.fill((0,0,0,0),rect)
+
+    piece = pygame.transform.scale(images["build_bad"],(titles,titles))
+    side = pygame.transform.rotate(piece,90)
+
+    for px in range(x,x+w,titles):
+        overlay.blit(piece,(px,y))
+        overlay.blit(piece,(px,y+h-titles))
+    for py in range(y+titles,y+h-titles,titles):
+        overlay.blit(side,(x,py))
+        overlay.blit(side,(x + w -titles,py)) 
+
+    return overlay       
+
+
+
+

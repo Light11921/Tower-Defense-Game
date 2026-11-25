@@ -1,0 +1,37 @@
+import pygame
+import main
+
+class Territory:
+    def __init__(self,center_tile,radius,cols,rows):
+        cx,cy = center_tile
+        self.cols,self.rows = cols,rows #size of the rows and colums in tiles 960/60 
+        self.left,self.top = cx + radius,cy - radius
+        self.right,self.bottom = cx + radius,cx - radius
+        self._clamp()
+
+    def _clamp(self):
+        self.left = max(self.left,0)
+        self.top = max(self.top,0)
+        self.right = min(self.right,self.cols -1)
+        self.bottom = min(self.bottom,self.rows -1) 
+
+    def contains(self,col,row):
+        return self.left <= col <= self.right and self.top <= row <= self.bottom
+
+    def expand(self,amount = 1):
+        self.top -= amount
+        self.left -= amount
+        self.bottom -=  amount
+        self.right -=  amount
+        self._clamp()
+
+    def is_full(self):
+        return (self.left == 0 and self.top == 0
+                    and self.right == self.cols -1 and self.buttom == self.rows -1)
+
+    def pixel_rect(self,titles):
+        return (self.left*titles,self.top*titles,(self.right- self.left +1)*titles,(self.bottom - self.top +1)*titles)
+
+
+
+
