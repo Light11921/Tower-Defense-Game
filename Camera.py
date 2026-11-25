@@ -32,24 +32,24 @@ class Camera :
         max_x = self.world_w - self.view_w/self.zoom
         max_y = self.world_h - self.view_h/self.zoom
 
-        self.x = min(max(self.x,0))
-        self.y = min(max(self.y,0))
+        self.x = min(max(self.x,0),max_x)
+        self.y = min(max(self.y,0),max_y)
 
     def zoom_at(self,screen_pos,factor):
 
         sx,sy = screen_pos
-        wx,wy = self.world_screen(sx,sy)
+        wx,wy = self.screen_world(sx,sy)
         self.zoom = min(max(self.zoom*factor,self.min_zoom),self.zoom_max)
 
-        self.x = wx -sy/self.zoom
-        self.y = wy - sx/self.zoom
+        self.x = wx -sx/self.zoom
+        self.y = wy - sy/self.zoom
         self.clamp()
 
     def pan(self,dx_screen,dy_screen):
 
         self.x -= dx_screen/self.zoom
         self.y -= dy_screen/self.zoom
-        self.clam()
+        self.clamp()
 
     def handle_event(self, e):
         if e.type == pygame.MOUSEWHEEL:
@@ -66,7 +66,7 @@ class Camera :
         step = self.pan_speed*dt
         
         dx = (keys[pygame.K_LEFT] or keys[pygame.K_a]) - (keys[pygame.K_RIGHT] or keys[pygame.K_d])
-        dy = (keys[pygame.K_UP or keys[pygame.K_w]]) - (keys[pygame.K_DOWN] or keys[pygame.K_w])
+        dy = (keys[pygame.K_UP] or keys[pygame.K_w]) - (keys[pygame.K_DOWN] or keys[pygame.K_s])
 
         if dx or dy :
             self.pan(dx*step,dy*step)         
