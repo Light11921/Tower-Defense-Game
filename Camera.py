@@ -70,3 +70,5 @@ class Camera :
 
         if dx or dy :
             self.pan(dx*step,dy*step)         
+
+            

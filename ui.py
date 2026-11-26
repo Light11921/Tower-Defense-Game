@@ -50,7 +50,7 @@ def make_overlay(images,land,world_w,world_h,titles):
     rect = pygame.Rect(land.pixel_rect(titles))
     overlay.fill((0,0,0,0),rect)
 
-    piece = pygame.transform.scale(images["build_bad"],(titles,titles))
+    piece = pygame.transform.scale(images,(titles,titles))
     side = pygame.transform.rotate(piece,90)
 
     for px in range(x,x+w,titles):
