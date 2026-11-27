@@ -1,5 +1,5 @@
 import pygame
-import main
+
 
 class Territory:
     def __init__(self,center_tile,radius,cols,rows):
@@ -10,7 +10,7 @@ class Territory:
         self.right,self.bottom = cx + self.rx,cy + self.ry#right-- +x direction bottom-- -y direction
         self._clamp()
 
-    def _clamp(self):
+    def _clamp(self):#to make the function not excced the world limit
         self.left = max(self.left,0)
         self.top = max(self.top,0)
         self.right = min(self.right,self.cols -1)
@@ -19,12 +19,25 @@ class Territory:
     def contains(self,col,row):
         return self.left <= col <= self.right and self.top <= row <= self.bottom
 
-    def expand(self,rx,ry = (1,1)):#this rx and ry are diff they are the x and y that will add according to the players need
-        self.top -= rx
-        self.left -= ry
-        self.bottom += rx
-        self.right += ry
-        self._clamp()
+    def gain(self,side,amount):
+        if side in ("left","right"):
+            room = self.left if side == "left" else self.cols - 1 - self.right
+            return min(amount,room)*(self.bottom - self.top +1)    
+        room = self.top if side == "top" else self.rows -1 - self.bottom
+        return min(amount,room)*(self.right - self.left + 1)
+    
+    def expand(self,side,amount = 1):#this rx and ry are diff they are the x and y that will add according to the players need
+        if side == "top":
+            self.top -= amount
+        elif side == 'left':
+            self.left -= amount
+        elif side == 'bottom':
+            self.bottom += amount
+        elif side == 'right':
+            self.right += amount
+        
+        self._clamp()#to make sure that the expand dont go outside the world limit
+
 
     def is_full(self):
         return (self.left == 0 and self.top == 0
